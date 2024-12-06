@@ -1,15 +1,26 @@
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { Button, ScrollView, Text, TouchableOpacity, View } from "react-native-web";
+import { Button, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native-web";
 import { getBooks } from "../services/api";
 
 export default function Home({ navigation }) {
     const [books, setBooks] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    
+    const [name, setName] = useState("");
+    const [ano, setAno] = useState();
+    const [bookId, setBookId] = useState();
+
+    const aluguelLivro = () => {
+        console.log(bookId)
+    }
 
     const getBooksAll = async () => {
         const booksData = await getBooks();
         setBooks(booksData);
     };
+
+
 
     useEffect(() => {
         getBooksAll();
@@ -28,13 +39,45 @@ export default function Home({ navigation }) {
                         </View>
 
                         <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={styles.button}>
+                            <TouchableOpacity style={styles.button} onPress={() => [setModalVisible(true), setBookId(item.id)]}>
                                 <Text style={styles.buttonText}>Emprestar</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                 ))}
             </ScrollView>
+
+            <Modal
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.overlay}>
+                <View style={styles.modal}>
+                    <Text style={styles.text}>Painel de aluguel para Bibliotecas!</Text>
+                    <TextInput 
+                        style={styles.input}
+                        placeholder="Nome do locatário:"
+                    />
+                    <TextInput 
+                        style={styles.input}
+                        placeholder="Ano de nascimento:"
+                    />
+                    <Button
+                        title="Emprestar"
+                        onPress={() => () => aluguelLivro()}
+                    />
+                    <Button
+                        title="Fechar"
+                        onPress={() => () => setModalVisible(false)}
+                    />
+                    <Button
+                        title="Emprestar"
+                        onPress={() => () => aluguelLivro()}
+                    />
+                </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -91,5 +134,35 @@ const styles = StyleSheet.create({
     },
     qtd: {
         fontWeight: "bold"
-    }
+    },
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      },
+      modal: {
+        width: 300,
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+        elevation: 5, 
+      },
+      text: {
+        marginBottom: 20,
+      },
+      input: {
+        width: '100%',
+        padding: 10,
+        borderWidth: 2,
+        borderColor: '#999',
+        borderRadius: 5, 
+        fontSize: 16,
+        marginBottom: 10,
+      },
+      inputFocus: {
+        borderColor: '#999', 
+      },
 });
+
